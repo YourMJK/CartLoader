@@ -1,0 +1,5 @@
+# Enable/disable functionality of this plugin
+enabled: true
+
+# Don't modify this
+config-version: 1
