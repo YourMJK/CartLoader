@@ -1,8 +1,9 @@
 package com.mjkrempl.cartchunkloader;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.logging.Level;
 
 public class Configuration {
 	public final boolean enabled;
@@ -24,19 +25,26 @@ public class Configuration {
 
 		this.enabled = config.getBoolean("enabled", true);
 		
-		ConfigurationSection minecartsSection = config.getConfigurationSection("minecarts");
-		this.minecart = minecartsSection.getBoolean("normal", false);
-		this.minecartChest = minecartsSection.getBoolean("chest", true);
-		this.minecartFurnace = minecartsSection.getBoolean("furnace", true);
-		this.minecartTNT = minecartsSection.getBoolean("tnt", true);
-		this.minecartHopper = minecartsSection.getBoolean("hopper", true);
-		this.minecartSpawner = minecartsSection.getBoolean("spawner", true);
-		this.minecartCommandBlock = minecartsSection.getBoolean("command-block", true);
+		this.minecart = config.getBoolean("minecarts.normal", false);
+		this.minecartChest = config.getBoolean("minecarts.chest", true);
+		this.minecartFurnace = config.getBoolean("minecarts.furnace", true);
+		this.minecartTNT = config.getBoolean("minecarts.tnt", true);
+		this.minecartHopper = config.getBoolean("minecarts.hopper", true);
+		this.minecartSpawner = config.getBoolean("minecarts.spawner", true);
+		this.minecartCommandBlock = config.getBoolean("minecarts.command-block", true);
 		
-		this.regionRadius = config.getInt("region-radius", 2);
-		this.keepLastRegionLoadedTime = config.getInt("keep-last-region-loaded-time", 600);
-		this.updateInterval = config.getInt("update-interval", 8);
+		this.regionRadius = getClampedInt(plugin, "region-radius", 2, 1);
+		this.keepLastRegionLoadedTime = getClampedInt(plugin, "keep-last-region-loaded-time", 600, 0);
+		this.updateInterval = getClampedInt(plugin, "update-interval", 8, 1);
 		this.speedThreshold = config.getDouble("speed-threshold", 0.001);
 		this.configVersion = config.getInt("config-version");
+	}
+	
+	private static int getClampedInt(JavaPlugin plugin, String path, int def, int min) {
+		int value = plugin.getConfig().getInt(path, def);
+		if (value >= min) return value;
+		
+		plugin.getLogger().log(Level.WARNING, "Config value \"" + path + "\" needs to be at least " + min + "!");
+		return min;
 	}
 }

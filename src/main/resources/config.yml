@@ -1,7 +1,7 @@
-# Enable/disable functionality of this plugin
+# Enable/disable functionality of this plugin.
 enabled: true
 
-# Configure which types of moving minecarts should load chunks
+# Configure which types of moving minecarts should load chunks.
 minecarts:
   normal: false
   chest: true
@@ -12,18 +12,19 @@ minecarts:
   command-block: true
 
 # Radius of the region of chunks around a moving minecart to load (in chunks).
-# Region will be a square of side length (radius*2 + 1) with the minecart's current chunk in the center
+# Region will be a square of side length (radius*2 + 1) with the minecart's current chunk in the center.
 region-radius: 2
 
-# How long to keep the region in which a minecart was last active in loaded after it stopped moving (in ticks)
+# How long to keep the region in which a minecart was last active in loaded after it stopped moving (in ticks).
 keep-last-region-loaded-time: 600
 
 # Minimum duration between checking positions of moving minecarts (in ticks).
-# Might need to be decreased for maximum speeds higher than vanilla
+# Might need to be decreased for maximum speeds higher than vanilla.
+# This also defines the interval for how often to check for inactive regions that need to be unloaded.
 update-interval: 8
 
-# Threshold below which speed a minecart is considered to be stationary (in blocks per tick)
+# Threshold below which speed a minecart is considered to be stationary (in blocks per tick).
 speed-threshold: 0.001
 
-# Don't modify this
+# Don't modify this.
 config-version: 1
