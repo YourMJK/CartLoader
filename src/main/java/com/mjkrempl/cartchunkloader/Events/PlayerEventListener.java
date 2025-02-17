@@ -8,8 +8,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.logging.Level;
-
 public class PlayerEventListener implements Listener {
 	private final JavaPlugin plugin;
 	private final GlobalChunkManager chunkManager;
@@ -22,6 +20,6 @@ public class PlayerEventListener implements Listener {
 	@EventHandler
 	public void onPlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer();
-		chunkManager.setPlayerActive(player);
+		chunkManager.onPlayerActivity(player);
 	}
 }

@@ -54,7 +54,7 @@ public final class WorldChunkManager {
 	}
 	
 	
-	public void setEntityActiveInChunk(UUID entityUID, int x, int z) {
+	public void onEntityActivity(UUID entityUID, int x, int z) {
 		// Update last active time for entity
 		entityActiveTimes.put(entityUID, world.getGameTime());
 		
@@ -72,14 +72,14 @@ public final class WorldChunkManager {
 		removeRegion(oldCoord);
 	}
 	
-	public void setEntityCreated(UUID entityUID, int x, int z) {
+	public void onEntityCreated(UUID entityUID, int x, int z) {
 		chunkLoadVisualizer.onEntityPositionUpdate(entityUID, x, z);
 	}
-	public void setEntityDestroyed(UUID entityUID) {
+	public void onEntityDestroyed(UUID entityUID) {
 		chunkLoadVisualizer.onEntityRemoved(entityUID);
 	}
 	
-	public void setPlayerActiveInChunk(UUID playerUID, int x, int z) {
+	public void onPlayerActivity(UUID playerUID, int x, int z) {
 		chunkLoadVisualizer.onPlayerPositionUpdate(playerUID, x, z);
 	}
 	
