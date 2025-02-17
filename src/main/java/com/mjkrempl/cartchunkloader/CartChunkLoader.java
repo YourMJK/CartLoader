@@ -2,6 +2,7 @@ package com.mjkrempl.cartchunkloader;
 
 import com.mjkrempl.cartchunkloader.ChunkManagement.GlobalChunkManager;
 import com.mjkrempl.cartchunkloader.Events.ChunkEventListener;
+import com.mjkrempl.cartchunkloader.Events.PlayerEventListener;
 import com.mjkrempl.cartchunkloader.Events.VehicleEventListener;
 
 import org.bukkit.entity.EntityType;
@@ -39,6 +40,8 @@ public final class CartChunkLoader extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(vehicleEventListener, this);
 		ChunkEventListener chunkEventListener = new ChunkEventListener(this, chunkManager);
 		getServer().getPluginManager().registerEvents(chunkEventListener, this);
+		PlayerEventListener playerEventListener = new PlayerEventListener(this, chunkManager);
+		getServer().getPluginManager().registerEvents(playerEventListener, this);
 	}
 
 	@Override

@@ -28,7 +28,7 @@ public final class WorldChunkManager {
 		this.chunkTickets = HashMultiset.create();
 		
 		// Visualizer
-		this.chunkLoadVisualizer = new ChunkLoadVisualizer(128, 8, world.getName());
+		this.chunkLoadVisualizer = new ChunkLoadVisualizer(96, 8, world.getName());
 		// Identify already loaded chunks as always loaded (spawn chunks)
 		Chunk[] loadedChunks = world.getLoadedChunks();
 		for (Chunk chunk : loadedChunks) {
@@ -61,6 +61,7 @@ public final class WorldChunkManager {
 		// Update position of active region for entity
 		ChunkCoord newCoord = new ChunkCoord(x, z);
 		ChunkCoord oldCoord = entityActiveRegions.put(entityUID, newCoord);
+		chunkLoadVisualizer.onEntityPositionUpdate(entityUID, x, z);
 		
 		if (newCoord.equals(oldCoord)) return;
 		// Position changed, update chunk tickets
@@ -71,11 +72,15 @@ public final class WorldChunkManager {
 		removeRegion(oldCoord);
 	}
 	
-	public void setEntityCreated(UUID entityUID) {
-		// TODO: Add to visualizer
+	public void setEntityCreated(UUID entityUID, int x, int z) {
+		chunkLoadVisualizer.onEntityPositionUpdate(entityUID, x, z);
 	}
 	public void setEntityDestroyed(UUID entityUID) {
-		// TODO: Remove from visualizer
+		chunkLoadVisualizer.onEntityRemoved(entityUID);
+	}
+	
+	public void setPlayerActiveInChunk(UUID playerUID, int x, int z) {
+		chunkLoadVisualizer.onPlayerPositionUpdate(playerUID, x, z);
 	}
 	
 	private void addRegion(ChunkCoord coord) {

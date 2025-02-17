@@ -42,7 +42,11 @@ public final class GlobalChunkManager {
 		UUID entityUID = entity.getUniqueId();
 		UUID worldUID = entity.getWorld().getUID();
 		
-		getManager(worldUID).setEntityCreated(entityUID);
+		Location location = entity.getLocation();
+		int x = location.getBlockX() >> 4;
+		int z = location.getBlockZ() >> 4;
+		
+		getManager(worldUID).setEntityCreated(entityUID, x, z);
 	}
 	
 	public void setEntityDestroyed(Entity entity) {
@@ -50,6 +54,17 @@ public final class GlobalChunkManager {
 		UUID worldUID = entity.getWorld().getUID();
 		
 		getManager(worldUID).setEntityDestroyed(entityUID);
+	}
+	
+	public void setPlayerActive(Entity entity) {
+		UUID entityUID = entity.getUniqueId();
+		UUID worldUID = entity.getWorld().getUID();
+		
+		Location location = entity.getLocation();
+		int x = location.getBlockX() >> 4;
+		int z = location.getBlockZ() >> 4;
+		
+		getManager(worldUID).setPlayerActiveInChunk(entityUID, x, z);
 	}
 	
 	public void onChunkLoaded(int x, int z, UUID worldUID) {
