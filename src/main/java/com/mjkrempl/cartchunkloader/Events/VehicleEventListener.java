@@ -40,27 +40,7 @@ public class VehicleEventListener implements Listener {
 		
 		// Only update chunks occasionally and only for significantly moving vehicles
 		if (speed >= speedThreshold && ticks % updateInterval == 0) {
-			//plugin.getLogger().log(Level.INFO, "Moving " + vehicle.getUniqueId() + ": " + ticks + " " + Math.round(speed*100)/100.0 + " " + vehicle.getLocation());
 			chunkManager.onEntityActivity(vehicle);
 		}
-	}
-	
-	
-	@EventHandler
-	public void onVehicleCreate(VehicleCreateEvent event) {
-		Vehicle vehicle = event.getVehicle();
-		if (!entityTypes.contains(vehicle.getType())) return;
-		
-		plugin.getLogger().log(Level.INFO, "Created " + vehicle.getUniqueId());
-		chunkManager.onEntityCreated(vehicle);
-	}
-	
-	@EventHandler
-	public void onVehicleDestroy(VehicleDestroyEvent event) {
-		Vehicle vehicle = event.getVehicle();
-		if (!entityTypes.contains(vehicle.getType())) return;
-		
-		plugin.getLogger().log(Level.INFO, "Destroyed " + vehicle.getUniqueId());
-		chunkManager.onEntityDestroyed(vehicle);
 	}
 }

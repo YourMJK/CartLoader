@@ -1,12 +1,10 @@
 package com.mjkrempl.cartchunkloader.ChunkManagement;
 
-import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
-import java.util.logging.Level;
 
 import com.google.common.collect.*;
 
@@ -17,7 +15,6 @@ public final class WorldChunkManager {
 	private final Map<UUID, ChunkCoord> entityActiveRegions;
 	private final Map<UUID, Long> entityActiveTimes;
 	private final Multiset<ChunkCoord> chunkTickets;
-	private final ChunkLoadVisualizer chunkLoadVisualizer;
 	
 	public WorldChunkManager(JavaPlugin plugin, World world, int regionRadius, int inactiveRegionLoadTime, int updateInterval) {
 		this.plugin = plugin;
@@ -27,24 +24,18 @@ public final class WorldChunkManager {
 		this.entityActiveTimes = new HashMap<>();
 		this.chunkTickets = HashMultiset.create();
 		
-		// Visualizer
-		this.chunkLoadVisualizer = new ChunkLoadVisualizer(96, 8, world.getName());
-		// Identify already loaded chunks as always loaded (spawn chunks)
-		Chunk[] loadedChunks = world.getLoadedChunks();
-		for (Chunk chunk : loadedChunks) {
-			chunkLoadVisualizer.onChunkAlwaysLoaded(chunk.getX(), chunk.getZ());
-		}
-		
 		// Setup periodic runnable to unload each entity's last active region after `inactiveRegionLoadTime` of inactivity
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				long now = world.getGameTime();
 				
+				// Enumerate previously active entities and the time of their last activity
 				entityActiveTimes.entrySet().removeIf(entry -> {
 					long entityActiveTime = entry.getValue();
 					if ((now - entityActiveTime) < inactiveRegionLoadTime) return false;
-					// Entity was inactive for longer than `inactiveRegionLoadTime`, remove last active region
+					
+					// Entity was inactive for longer than `inactiveRegionLoadTime`, remove last active region and forget entity
 					ChunkCoord coord = entityActiveRegions.remove(entry.getKey());
 					removeRegion(coord);
 					return true;
@@ -61,27 +52,16 @@ public final class WorldChunkManager {
 		// Update position of active region for entity
 		ChunkCoord newCoord = new ChunkCoord(x, z);
 		ChunkCoord oldCoord = entityActiveRegions.put(entityUID, newCoord);
-		chunkLoadVisualizer.onEntityPositionUpdate(entityUID, x, z);
 		
+		// If position changed, update chunk tickets
 		if (newCoord.equals(oldCoord)) return;
-		// Position changed, update chunk tickets
 		addRegion(newCoord);
 		
+		// If no previous position, no chunk tickets to remove
 		if (oldCoord == null) return;
-		// No previous position, no chunk tickets to remove
 		removeRegion(oldCoord);
 	}
 	
-	public void onEntityCreated(UUID entityUID, int x, int z) {
-		chunkLoadVisualizer.onEntityPositionUpdate(entityUID, x, z);
-	}
-	public void onEntityDestroyed(UUID entityUID) {
-		chunkLoadVisualizer.onEntityRemoved(entityUID);
-	}
-	
-	public void onPlayerActivity(UUID playerUID, int x, int z) {
-		chunkLoadVisualizer.onPlayerPositionUpdate(playerUID, x, z);
-	}
 	
 	private void addRegion(ChunkCoord coord) {
 		Iterator<ChunkCoord> region = createRegionIterator(coord);
@@ -93,23 +73,23 @@ public final class WorldChunkManager {
 	}
 	
 	private void addChunkTicket(ChunkCoord coord) {
-		boolean isFirstOccurrence = chunkTickets.add(coord, 1) == 0;
+		int previousCount = chunkTickets.add(coord, 1);
+		boolean isFirstOccurrence = (previousCount == 0);
 		if (isFirstOccurrence) {
-			// New chunk to keep loaded, add ticket
+			// Is new chunk to be kept loaded, add ticket
 			int x = coord.getX();
 			int z = coord.getZ();
 			world.addPluginChunkTicket(x, z, plugin);
-			onChunkTicketAdd(x, z);
 		}
 	}
 	private void removeChunkTicket(ChunkCoord coord) {
-		boolean wasLastOccurrence = chunkTickets.remove(coord, 1) == 1;
+		int previousCount = chunkTickets.remove(coord, 1);
+		boolean wasLastOccurrence = (previousCount == 1);
 		if (wasLastOccurrence) {
-			// Chunk not required to keep loaded, remove ticket
+			// Chunk isn't required to be kept loaded anymore, remove ticket
 			int x = coord.getX();
 			int z = coord.getZ();
 			world.removePluginChunkTicket(x, z, plugin);
-			onChunkTicketRemove(x, z);
 		}
 	}
 	
@@ -127,6 +107,8 @@ public final class WorldChunkManager {
 			}
 			@Override
 			public ChunkCoord next() {
+				// Iterate coordinates of a square with center at (x,z) and side length (2*r+1),
+				// starting at top left (x-r,z-r) and moving left-to-right (+x) and top-to-bottom (+z).
 				ChunkCoord coord = new ChunkCoord(x+i, z+j);
 				i++;
 				if (i > r) {
@@ -136,29 +118,5 @@ public final class WorldChunkManager {
 				return coord;
 			}
 		};
-	}
-	
-	
-	public void onChunkLoaded(int x, int z) {
-		chunkLoadVisualizer.onChunkLoaded(x, z);
-	}
-	public void onChunkUnloaded(int x, int z) {
-		chunkLoadVisualizer.onChunkUnloaded(x, z);
-	}
-	
-	public void onEntitiesLoaded(int x, int z) {
-		chunkLoadVisualizer.onEntitiesLoaded(x, z);
-	}
-	public void onEntitiesUnloaded(int x, int z) {
-		chunkLoadVisualizer.onEntitiesUnloaded(x, z);
-	}
-	
-	public void onChunkTicketAdd(int x, int z) {
-		plugin.getLogger().log(Level.INFO, "ADD " + x + " " + z);
-		chunkLoadVisualizer.onChunkTicketAdd(x, z);
-	}
-	public void onChunkTicketRemove(int x, int z) {
-		plugin.getLogger().log(Level.INFO, "REMOVE " + x + " " + z);
-		chunkLoadVisualizer.onChunkTicketRemove(x, z);
 	}
 }
