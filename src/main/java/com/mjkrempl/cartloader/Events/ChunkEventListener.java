@@ -1,6 +1,6 @@
-package com.mjkrempl.cartchunkloader.Events;
+package com.mjkrempl.cartloader.Events;
 
-import com.mjkrempl.cartchunkloader.ChunkManagement.GlobalChunkManager;
+import com.mjkrempl.cartloader.ChunkManagement.GlobalChunkManager;
 
 import org.bukkit.Chunk;
 import org.bukkit.event.EventHandler;

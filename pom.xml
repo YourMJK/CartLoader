@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.mjkrempl.cartchunkloader</groupId>
-	<artifactId>CartChunkLoader</artifactId>
+	<groupId>com.mjkrempl.cartloader</groupId>
+	<artifactId>CartLoader</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>CartChunkLoader</name>
+	<name>CartLoader</name>
 
 	<properties>
 		<java.version>17</java.version>

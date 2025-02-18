@@ -1,4 +1,4 @@
-package com.mjkrempl.cartchunkloader;
+package com.mjkrempl.cartloader;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;

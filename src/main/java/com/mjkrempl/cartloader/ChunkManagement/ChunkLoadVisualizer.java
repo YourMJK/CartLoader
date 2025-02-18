@@ -1,4 +1,4 @@
-package com.mjkrempl.cartchunkloader.ChunkManagement;
+package com.mjkrempl.cartloader.ChunkManagement;
 
 import javax.swing.*;
 import java.awt.*;

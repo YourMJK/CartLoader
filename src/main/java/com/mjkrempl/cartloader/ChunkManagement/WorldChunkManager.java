@@ -1,4 +1,4 @@
-package com.mjkrempl.cartchunkloader.ChunkManagement;
+package com.mjkrempl.cartloader.ChunkManagement;
 
 import org.bukkit.Chunk;
 import org.bukkit.World;
