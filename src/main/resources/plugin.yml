@@ -2,3 +2,6 @@ name: '${project.name}'
 version: '${project.version}'
 main: '${project.groupId}.CartLoader'
 api-version: '1.17'
+description: 'A plugin enabling Minecarts to dynamically load chunks, ensuring seamless long-distance travel without player presence.'
+author: YourMJK
+website: https://github.com/YourMJK/CartLoader
