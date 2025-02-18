@@ -1,4 +1,4 @@
-package com.mjkrempl.cartchunkloader.ChunkManagement;
+package com.mjkrempl.cartloader.ChunkManagement;
 
 public final class ChunkCoord {
 	private final long pairValue;

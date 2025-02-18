@@ -1,7 +1,7 @@
-package com.mjkrempl.cartchunkloader;
+package com.mjkrempl.cartloader;
 
-import com.mjkrempl.cartchunkloader.ChunkManagement.GlobalChunkManager;
-import com.mjkrempl.cartchunkloader.Events.VehicleEventListener;
+import com.mjkrempl.cartloader.ChunkManagement.GlobalChunkManager;
+import com.mjkrempl.cartloader.Events.VehicleEventListener;
 
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -9,7 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class CartChunkLoader extends JavaPlugin {
+public final class CartLoader extends JavaPlugin {
 	private Configuration configuration;
 	private GlobalChunkManager chunkManager;
 	
