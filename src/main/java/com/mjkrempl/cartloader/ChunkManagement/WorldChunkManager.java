@@ -23,12 +23,12 @@ public final class WorldChunkManager {
 	private final ChunkLoadVisualizer chunkLoadVisualizer;
 	private BukkitTask cleanupTask;
 	
-	public WorldChunkManager(JavaPlugin plugin, World world, int regionRadius, int inactiveRegionLoadTime, int updateInterval) {
+	public WorldChunkManager(JavaPlugin plugin, World world, ChunkManagerConfiguration configuration) {
 		this.plugin = plugin;
 		this.world = world;
-		this.regionRadius = regionRadius;
-		this.inactiveRegionLoadTime = inactiveRegionLoadTime;
-		this.updateInterval = updateInterval;
+		this.regionRadius = configuration.regionRadius;
+		this.inactiveRegionLoadTime = configuration.inactiveRegionLoadTime;
+		this.updateInterval = configuration.updateInterval;
 		this.entityActiveRegions = new HashMap<>();
 		this.entityActiveTimes = new HashMap<>();
 		this.chunkTickets = HashMultiset.create();
@@ -87,7 +87,7 @@ public final class WorldChunkManager {
 	private void addChunkTicket(ChunkCoord coord) {
 		boolean isFirstOccurrence = chunkTickets.add(coord, 1) == 0;
 		if (isFirstOccurrence) {
-			// New chunk to keep loaded, add ticket
+			// Is new chunk to be kept loaded, add ticket
 			int x = coord.getX();
 			int z = coord.getZ();
 			world.addPluginChunkTicket(x, z, plugin);
@@ -97,7 +97,7 @@ public final class WorldChunkManager {
 	private void removeChunkTicket(ChunkCoord coord) {
 		boolean wasLastOccurrence = chunkTickets.remove(coord, 1) == 1;
 		if (wasLastOccurrence) {
-			// Chunk not required to keep loaded, remove ticket
+			// Chunk isn't required to be kept loaded anymore, remove ticket
 			int x = coord.getX();
 			int z = coord.getZ();
 			world.removePluginChunkTicket(x, z, plugin);
