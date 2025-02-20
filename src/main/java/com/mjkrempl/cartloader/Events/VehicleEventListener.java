@@ -12,14 +12,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Set;
 
 public class VehicleEventListener implements Listener {
-	private final JavaPlugin plugin;
 	private final GlobalChunkManager chunkManager;
 	private final Set<EntityType> entityTypes;
 	private final double speedThreshold;
 	private final int updateInterval;
 	
-	public VehicleEventListener(JavaPlugin plugin, GlobalChunkManager chunkManager, Set<EntityType> entityTypes, double speedThreshold, int updateInterval) {
-		this.plugin = plugin;
+	public VehicleEventListener(GlobalChunkManager chunkManager, Set<EntityType> entityTypes, double speedThreshold, int updateInterval) {
 		this.chunkManager = chunkManager;
 		this.entityTypes = entityTypes;
 		this.speedThreshold = speedThreshold;
