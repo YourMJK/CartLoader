@@ -20,7 +20,7 @@ public final class WorldChunkManager {
 	private final Multiset<ChunkCoord> chunkTickets;
 	private BukkitTask cleanupTask;
 	
-	public WorldChunkManager(JavaPlugin plugin, World world, ChunkManagerConfiguration configuration) {
+	public WorldChunkManager(JavaPlugin plugin, World world, WorldSavedState savedState, ChunkManagerConfiguration configuration) {
 		this.plugin = plugin;
 		this.world = world;
 		this.regionRadius = configuration.regionRadius;
@@ -29,6 +29,13 @@ public final class WorldChunkManager {
 		this.entityActiveRegions = new HashMap<>();
 		this.entityActiveTimes = new HashMap<>();
 		this.chunkTickets = HashMultiset.create();
+		
+		// For each entry in the saved state, simulate a new entity activity at its last observed coordinate
+		if (savedState != null) {
+			savedState.entityRegions.forEach((entityUID, pairValue) -> {
+				onEntityActivity(entityUID, ChunkCoord.getX(pairValue), ChunkCoord.getZ(pairValue));
+			});
+		}
 	}
 	
 	
@@ -50,6 +57,10 @@ public final class WorldChunkManager {
 		// If no previous position, no chunk tickets to remove
 		if (oldCoord == null) return;
 		removeRegion(oldCoord);
+	}
+	
+	public WorldSavedState getSavedState() {
+		return WorldSavedState.fromRegions(entityActiveRegions);
 	}
 	
 	
