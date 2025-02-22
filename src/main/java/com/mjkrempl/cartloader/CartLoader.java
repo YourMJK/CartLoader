@@ -2,6 +2,7 @@ package com.mjkrempl.cartloader;
 
 import com.mjkrempl.cartloader.ChunkManagement.ChunkManagerConfiguration;
 import com.mjkrempl.cartloader.ChunkManagement.GlobalChunkManager;
+import com.mjkrempl.cartloader.ChunkManagement.GlobalSavedState;
 import com.mjkrempl.cartloader.Events.ChunkEventListener;
 import com.mjkrempl.cartloader.Events.PlayerEventListener;
 import com.mjkrempl.cartloader.Events.VehicleEventListener;
@@ -9,24 +10,39 @@ import com.mjkrempl.cartloader.Events.VehicleEventListener;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
 
 public final class CartLoader extends JavaPlugin {
 	private Configuration config;
+	private StateStorage stateStorage;
+	private GlobalSavedState lastSavedState;
 	private GlobalChunkManager chunkManager;
 	
 	@Override
-	public void onEnable() {
+	public void onLoad() {
 		saveDefaultConfig();
 		config = new Configuration(this);
 		
 		// Don't set up if config wishes to disable functionality
 		if (!config.enabled) return;
 		
+		// Load last chunk manager states
+		getLogger().log(Level.INFO, "Loading saved state");
+		File stateStorageDirectory = new File(getDataFolder(), "saved-states");
+		stateStorage = new StateStorage(stateStorageDirectory, getLogger());
+		lastSavedState = stateStorage.load();
+	}
+	
+	@Override
+	public void onEnable() {
+		if (!config.enabled) return;
+		
 		// Setup chunk manager and entity types
 		ChunkManagerConfiguration managerConfig = new ChunkManagerConfiguration(config.regionRadius, config.keepLastRegionLoadedTime, config.updateInterval);
-		chunkManager = new GlobalChunkManager(this, managerConfig);
+		chunkManager = new GlobalChunkManager(this, lastSavedState, managerConfig);
 		
 		Set<EntityType> vehicleEventEntityTypes = new HashSet<>();
 		if (config.minecart) vehicleEventEntityTypes.add(EntityType.MINECART);
@@ -48,7 +64,10 @@ public final class CartLoader extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-	
+		if (!config.enabled) return;
+		
+		// Save current chunk manager states
+		getLogger().log(Level.INFO, "Saving state");
+		stateStorage.save(chunkManager.getSavedStates());
 	}
-	
 }

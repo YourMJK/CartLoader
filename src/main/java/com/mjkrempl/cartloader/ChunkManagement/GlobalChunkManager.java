@@ -12,15 +12,23 @@ public final class GlobalChunkManager {
 	private final Map<UUID, WorldChunkManager> managers;
 	private final ChunkManagerConfiguration configuration;
 	
-	public GlobalChunkManager(JavaPlugin plugin, ChunkManagerConfiguration configuration) {
+	public GlobalChunkManager(JavaPlugin plugin, GlobalSavedState globalState, ChunkManagerConfiguration configuration) {
 		this.plugin = plugin;
 		this.managers = new HashMap<>();
 		this.configuration = configuration;
 		
-		// Create a new chunk manager for each world
+		// Create a new chunk manager for each world with its saved state
 		for (World world : plugin.getServer().getWorlds()) {
-			WorldChunkManager manager = new WorldChunkManager(plugin, world, configuration);
-			managers.put(world.getUID(), manager);
+			UUID worldUID = world.getUID();
+			
+			// Inject saved state if present
+			WorldSavedState worldState = null;
+			if (globalState != null) {
+				worldState = globalState.worldStates.get(worldUID);
+			}
+			
+			WorldChunkManager manager = new WorldChunkManager(plugin, world, worldState, configuration);
+			managers.put(worldUID, manager);
 		}
 	}
 	
@@ -79,11 +87,16 @@ public final class GlobalChunkManager {
 		getManager(worldUID).onEntitiesUnloaded(x, z);
 	}
 	
+	public GlobalSavedState getSavedStates() {
+		return GlobalSavedState.fromManagers(managers);
+	}
+	
+	
 	private WorldChunkManager getManager(UUID worldUID) {
 		return managers.computeIfAbsent(worldUID, k -> {
 			World world = plugin.getServer().getWorld(worldUID);
 			assert world != null;
-			return new WorldChunkManager(plugin, world, configuration);
+			return new WorldChunkManager(plugin, world, null, configuration);
 		});
 	}
 }

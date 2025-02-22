@@ -23,7 +23,7 @@ public final class WorldChunkManager {
 	private final ChunkLoadVisualizer chunkLoadVisualizer;
 	private BukkitTask cleanupTask;
 	
-	public WorldChunkManager(JavaPlugin plugin, World world, ChunkManagerConfiguration configuration) {
+	public WorldChunkManager(JavaPlugin plugin, World world, WorldSavedState savedState, ChunkManagerConfiguration configuration) {
 		this.plugin = plugin;
 		this.world = world;
 		this.regionRadius = configuration.regionRadius;
@@ -39,6 +39,13 @@ public final class WorldChunkManager {
 		Chunk[] loadedChunks = world.getLoadedChunks();
 		for (Chunk chunk : loadedChunks) {
 			chunkLoadVisualizer.onChunkAlwaysLoaded(chunk.getX(), chunk.getZ());
+		}
+		
+		// For each entry in the saved state, simulate a new entity activity at its last observed coordinate
+		if (savedState != null) {
+			savedState.entityRegions.forEach((entityUID, pairValue) -> {
+				onEntityActivity(entityUID, ChunkCoord.getX(pairValue), ChunkCoord.getZ(pairValue));
+			});
 		}
 	}
 	
@@ -74,6 +81,11 @@ public final class WorldChunkManager {
 	public void onPlayerActivity(UUID playerUID, int x, int z) {
 		chunkLoadVisualizer.onPlayerPositionUpdate(playerUID, x, z);
 	}
+	
+	public WorldSavedState getSavedState() {
+		return WorldSavedState.fromRegions(entityActiveRegions);
+	}
+	
 	
 	private void addRegion(ChunkCoord coord) {
 		Iterator<ChunkCoord> region = createRegionIterator(coord);

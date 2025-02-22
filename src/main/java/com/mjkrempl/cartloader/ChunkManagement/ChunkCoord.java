@@ -24,6 +24,9 @@ public final class ChunkCoord {
 		return (int)(pairValue >> 32);
 	}
 	
+	public long getPairValue() {
+		return pairValue;
+	}
 	public int getX() {
 		return getX(pairValue);
 	}
