@@ -36,7 +36,10 @@ public final class CartLoader extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
-		if (!config.enabled) return;
+		if (!config.enabled) {
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
 		
 		// Setup chunk manager and entity types
 		ChunkManagerConfiguration managerConfig = new ChunkManagerConfiguration(config.regionRadius, config.keepLastRegionLoadedTime, config.updateInterval);
