@@ -23,6 +23,7 @@ public class Configuration {
 	public final boolean minecartCommandBlock;
 	public final int regionRadius;
 	public final int keepLastRegionLoadedTime;
+	public final boolean restoreRegionsAfterRestart;
 	public final int updateInterval;
 	public final double speedThreshold;
 	public final int configVersion;
@@ -46,6 +47,7 @@ public class Configuration {
 		
 		this.regionRadius = getClampedInt(plugin, "region-radius", 2, 1);
 		this.keepLastRegionLoadedTime = getClampedInt(plugin, "keep-last-region-loaded-time", 600, 0);
+		this.restoreRegionsAfterRestart = config.getBoolean("restore-regions-after-restart", true);
 		this.updateInterval = getClampedInt(plugin, "update-interval", 8, 1);
 		this.speedThreshold = config.getDouble("speed-threshold", 0.001);
 		this.configVersion = config.getInt("config-version");

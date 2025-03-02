@@ -18,6 +18,10 @@ region-radius: 2
 # How long to keep the region in which a minecart was last active in loaded after it stopped moving (in ticks).
 keep-last-region-loaded-time: 600
 
+# Whether to save the currently loaded regions at server shutdown and reload them again at the next startup.
+# This ensures that all previously moving minecarts will immediately resume movement (even without nearby players loading their chunks first).
+restore-regions-after-restart: true
+
 # Minimum duration between checking positions of moving minecarts (in ticks).
 # Might need to be decreased for maximum speeds higher than vanilla.
 # This also defines the interval for how often to check for inactive regions that need to be unloaded.
@@ -27,4 +31,4 @@ update-interval: 8
 speed-threshold: 0.001
 
 # Don't modify this.
-config-version: 1
+config-version: 2
