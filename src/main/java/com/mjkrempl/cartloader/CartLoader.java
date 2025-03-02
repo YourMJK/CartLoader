@@ -22,6 +22,7 @@ public final class CartLoader extends JavaPlugin {
 	@Override
 	public void onLoad() {
 		saveDefaultConfig();
+		Configuration.migrateIfNecessary(this);
 		config = new Configuration(this);
 		
 		// Don't set up if config wishes to disable functionality
