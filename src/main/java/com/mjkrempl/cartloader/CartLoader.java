@@ -5,14 +5,17 @@ import com.mjkrempl.cartloader.ChunkManagement.GlobalChunkManager;
 import com.mjkrempl.cartloader.ChunkManagement.GlobalSavedState;
 import com.mjkrempl.cartloader.Events.ChunkEventListener;
 import com.mjkrempl.cartloader.Events.PlayerEventListener;
+import com.mjkrempl.cartloader.ChunkManagement.WorldSavedState;
 import com.mjkrempl.cartloader.Events.VehicleEventListener;
 
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public final class CartLoader extends JavaPlugin {
@@ -31,10 +34,12 @@ public final class CartLoader extends JavaPlugin {
 		if (!config.enabled) return;
 		
 		// Load last chunk manager states
-		getLogger().log(Level.INFO, "Loading saved state");
-		File stateStorageDirectory = new File(getDataFolder(), "saved-states");
-		stateStorage = new StateStorage(stateStorageDirectory, getLogger());
-		lastSavedState = stateStorage.load();
+		if (config.restoreRegionsAfterRestart) {
+			getLogger().log(Level.INFO, "Loading saved state");
+			File stateStorageDirectory = new File(getDataFolder(), "saved-states");
+			stateStorage = new StateStorage(stateStorageDirectory, getLogger());
+			lastSavedState = stateStorage.load();
+		}
 	}
 	
 	@Override
@@ -42,6 +47,14 @@ public final class CartLoader extends JavaPlugin {
 		if (!config.enabled) {
 			getServer().getPluginManager().disablePlugin(this);
 			return;
+		}
+		
+		// Log number of restored regions per world from saved state
+		if (lastSavedState != null && !lastSavedState.worldStates.isEmpty()) {
+			getLogger().log(Level.INFO, "Restored saved state");
+			lastSavedState.worldStates.forEach((worldUID, worldState) -> {
+				logRegionsInWorldState(worldUID, worldState, "Loading");
+			});
 		}
 		
 		// Setup chunk manager and entity types
@@ -71,7 +84,26 @@ public final class CartLoader extends JavaPlugin {
 		if (!config.enabled) return;
 		
 		// Save current chunk manager states
-		getLogger().log(Level.INFO, "Saving state");
-		stateStorage.save(chunkManager.getSavedStates());
+		if (config.restoreRegionsAfterRestart) {
+			getLogger().log(Level.INFO, "Saving state");
+			GlobalSavedState savedStates = chunkManager.getSavedStates();
+			stateStorage.save(savedStates);
+			
+			// Log number of saved regions per world
+			savedStates.worldStates.forEach((worldUID, worldState) -> {
+				logRegionsInWorldState(worldUID, worldState, "Saved");
+			});
+		}
+	}
+	
+	
+	private void logRegionsInWorldState(UUID worldUID, WorldSavedState worldState, String prefix) {
+		if (worldState.entityRegions.isEmpty()) return;
+		
+		int numberOfRegions = worldState.entityRegions.size();
+		World world = getServer().getWorld(worldUID);
+		String worldName = (world != null) ? world.getName() : worldUID.toString();
+		
+		getLogger().log(Level.INFO, prefix + " " + numberOfRegions + " regions in \"" + worldName + "\"");
 	}
 }
