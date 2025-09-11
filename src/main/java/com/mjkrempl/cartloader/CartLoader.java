@@ -61,12 +61,12 @@ public final class CartLoader extends JavaPlugin {
 		
 		Set<EntityType> vehicleEventEntityTypes = new HashSet<>();
 		if (config.minecart) vehicleEventEntityTypes.add(EntityType.MINECART);
-		if (config.minecartChest) vehicleEventEntityTypes.add(EntityType.MINECART_CHEST);
-		if (config.minecartFurnace) vehicleEventEntityTypes.add(EntityType.MINECART_FURNACE);
-		if (config.minecartTNT) vehicleEventEntityTypes.add(EntityType.MINECART_TNT);
-		if (config.minecartHopper) vehicleEventEntityTypes.add(EntityType.MINECART_HOPPER);
-		if (config.minecartSpawner) vehicleEventEntityTypes.add(EntityType.MINECART_MOB_SPAWNER);
-		if (config.minecartCommandBlock) vehicleEventEntityTypes.add(EntityType.MINECART_COMMAND);
+		if (config.minecartChest) vehicleEventEntityTypes.add(EntityType.CHEST_MINECART);
+		if (config.minecartFurnace) vehicleEventEntityTypes.add(EntityType.FURNACE_MINECART);
+		if (config.minecartTNT) vehicleEventEntityTypes.add(EntityType.TNT_MINECART);
+		if (config.minecartHopper) vehicleEventEntityTypes.add(EntityType.HOPPER_MINECART);
+		if (config.minecartSpawner) vehicleEventEntityTypes.add(EntityType.SPAWNER_MINECART);
+		if (config.minecartCommandBlock) vehicleEventEntityTypes.add(EntityType.COMMAND_BLOCK_MINECART);
 		
 		// Register event handlers
 		VehicleEventListener vehicleEventListener = new VehicleEventListener(chunkManager, vehicleEventEntityTypes, config.speedThreshold, config.updateInterval);
