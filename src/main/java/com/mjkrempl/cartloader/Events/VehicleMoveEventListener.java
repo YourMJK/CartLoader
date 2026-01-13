@@ -1,5 +1,6 @@
 package com.mjkrempl.cartloader.Events;
 
+import com.mjkrempl.cartloader.CartLoader;
 import com.mjkrempl.cartloader.ChunkManagement.GlobalChunkManager;
 
 import org.bukkit.entity.EntityType;
@@ -9,20 +10,17 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Set;
 import java.util.logging.Level;
 
-public class VehicleEventListener implements Listener {
-	private final JavaPlugin plugin;
+public class VehicleMoveEventListener implements Listener {
 	private final GlobalChunkManager chunkManager;
 	private final Set<EntityType> entityTypes;
 	private final double speedThreshold;
 	private final int updateInterval;
 	
-	public VehicleEventListener(JavaPlugin plugin, GlobalChunkManager chunkManager, Set<EntityType> entityTypes, double speedThreshold, int updateInterval) {
-		this.plugin = plugin;
+	public VehicleMoveEventListener(GlobalChunkManager chunkManager, Set<EntityType> entityTypes, double speedThreshold, int updateInterval) {
 		this.chunkManager = chunkManager;
 		this.entityTypes = entityTypes;
 		this.speedThreshold = speedThreshold;
@@ -51,7 +49,7 @@ public class VehicleEventListener implements Listener {
 		Vehicle vehicle = event.getVehicle();
 		if (!entityTypes.contains(vehicle.getType())) return;
 		
-		plugin.getLogger().log(Level.INFO, "Created " + vehicle.getUniqueId());
+		CartLoader.log(Level.INFO, "Created " + vehicle.getUniqueId());
 		chunkManager.onEntityCreated(vehicle);
 	}
 	
@@ -60,7 +58,7 @@ public class VehicleEventListener implements Listener {
 		Vehicle vehicle = event.getVehicle();
 		if (!entityTypes.contains(vehicle.getType())) return;
 		
-		plugin.getLogger().log(Level.INFO, "Destroyed " + vehicle.getUniqueId());
+		CartLoader.log(Level.INFO, "Destroyed " + vehicle.getUniqueId());
 		chunkManager.onEntityDestroyed(vehicle);
 	}
 }
