@@ -7,17 +7,16 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Set;
 
-public class VehicleEventListener implements Listener {
+public class VehicleMoveEventListener implements Listener {
 	private final GlobalChunkManager chunkManager;
 	private final Set<EntityType> entityTypes;
 	private final double speedThreshold;
 	private final int updateInterval;
 	
-	public VehicleEventListener(GlobalChunkManager chunkManager, Set<EntityType> entityTypes, double speedThreshold, int updateInterval) {
+	public VehicleMoveEventListener(GlobalChunkManager chunkManager, Set<EntityType> entityTypes, double speedThreshold, int updateInterval) {
 		this.chunkManager = chunkManager;
 		this.entityTypes = entityTypes;
 		this.speedThreshold = speedThreshold;

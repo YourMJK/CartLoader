@@ -4,10 +4,11 @@ import com.mjkrempl.cartloader.ChunkManagement.ChunkManagerConfiguration;
 import com.mjkrempl.cartloader.ChunkManagement.GlobalChunkManager;
 import com.mjkrempl.cartloader.ChunkManagement.GlobalSavedState;
 import com.mjkrempl.cartloader.ChunkManagement.WorldSavedState;
-import com.mjkrempl.cartloader.Events.VehicleEventListener;
+import com.mjkrempl.cartloader.Events.VehicleMoveEventListener;
 
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -77,8 +78,12 @@ public final class CartLoader extends JavaPlugin {
 		if (config.minecartCommandBlock) vehicleEventEntityTypes.add(EntityType.COMMAND_BLOCK_MINECART);
 		
 		// Register event handlers
-		VehicleEventListener vehicleEventListener = new VehicleEventListener(chunkManager, vehicleEventEntityTypes, config.speedThreshold, config.updateInterval);
-		getServer().getPluginManager().registerEvents(vehicleEventListener, this);
+		registerEventListener(new VehicleMoveEventListener(
+			chunkManager,
+			vehicleEventEntityTypes,
+			config.speedThreshold,
+			config.updateInterval
+		));
 	}
 	
 	@Override
@@ -96,6 +101,13 @@ public final class CartLoader extends JavaPlugin {
 				logRegionsInWorldState(worldUID, worldState, "Saved");
 			});
 		}
+	}
+	
+	
+	// - Helpers
+	
+	private void registerEventListener(Listener listener) {
+		getServer().getPluginManager().registerEvents(listener, this);
 	}
 	
 	
