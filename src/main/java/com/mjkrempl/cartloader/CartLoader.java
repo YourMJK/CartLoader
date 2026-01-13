@@ -13,16 +13,24 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public final class CartLoader extends JavaPlugin {
 	private Configuration config;
 	private StateStorage stateStorage;
 	private GlobalSavedState lastSavedState;
 	private GlobalChunkManager chunkManager;
+	
+	public CartLoader() {
+		super();
+		logger = getLogger();
+	}
+	
+	
+	// - Plugin
 	
 	@Override
 	public void onLoad() {
@@ -97,6 +105,18 @@ public final class CartLoader extends JavaPlugin {
 	}
 	
 	
+	// - Logging
+	
+	private static Logger logger;
+	
+	public static void log(java.util.logging.Level level, Object... items) {
+		String message = Arrays.stream(items)
+			.map(o -> o == null ? "(null)" : o)
+			.map(Object::toString)
+			.collect(Collectors.joining(" "));
+		logger.log(level, message);
+	}
+	
 	private void logRegionsInWorldState(UUID worldUID, WorldSavedState worldState, String prefix) {
 		if (worldState.entityRegions.isEmpty()) return;
 		
@@ -104,6 +124,6 @@ public final class CartLoader extends JavaPlugin {
 		World world = getServer().getWorld(worldUID);
 		String worldName = (world != null) ? world.getName() : worldUID.toString();
 		
-		getLogger().log(Level.INFO, prefix + " " + numberOfRegions + " regions in \"" + worldName + "\"");
+		log(Level.INFO, prefix + " " + numberOfRegions + " regions in \"" + worldName + "\"");
 	}
 }
