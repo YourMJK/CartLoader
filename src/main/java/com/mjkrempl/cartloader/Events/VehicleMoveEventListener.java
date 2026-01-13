@@ -2,6 +2,7 @@ package com.mjkrempl.cartloader.Events;
 
 import com.mjkrempl.cartloader.ChunkManagement.GlobalChunkManager;
 
+import com.mjkrempl.cartloader.CustomMinecart;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -26,8 +27,8 @@ public class VehicleMoveEventListener implements Listener {
 	@EventHandler
 	public void onVehicleMove(VehicleMoveEvent event) {
 		Vehicle vehicle = event.getVehicle();
-		// Ignore non-specified vehicles
-		if (!entityTypes.contains(vehicle.getType())) return;
+		// Ignore non-specified and non-custom vehicles
+		if (!entityTypes.contains(vehicle.getType()) && !CustomMinecart.isEntity(vehicle)) return;
 		
 		double speed = vehicle.getVelocity().length();
 		int ticks = vehicle.getTicksLived();

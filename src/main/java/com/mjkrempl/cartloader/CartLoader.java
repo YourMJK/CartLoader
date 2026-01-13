@@ -4,6 +4,7 @@ import com.mjkrempl.cartloader.ChunkManagement.ChunkManagerConfiguration;
 import com.mjkrempl.cartloader.ChunkManagement.GlobalChunkManager;
 import com.mjkrempl.cartloader.ChunkManagement.GlobalSavedState;
 import com.mjkrempl.cartloader.ChunkManagement.WorldSavedState;
+import com.mjkrempl.cartloader.Events.VehicleDropItemEventListener;
 import com.mjkrempl.cartloader.Events.VehicleMoveEventListener;
 
 import org.bukkit.World;
@@ -84,6 +85,7 @@ public final class CartLoader extends JavaPlugin {
 			config.speedThreshold,
 			config.updateInterval
 		));
+		registerEventListener(new VehicleDropItemEventListener());
 	}
 	
 	@Override
