@@ -3,7 +3,7 @@ package com.mjkrempl.cartloader.Events;
 import com.mjkrempl.cartloader.CartLoader;
 import com.mjkrempl.cartloader.ChunkManagement.GlobalChunkManager;
 
-import com.mjkrempl.cartloader.CustomMinecart;
+import com.mjkrempl.cartloader.Minecart.CustomMinecart;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -15,13 +15,13 @@ import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import java.util.Set;
 import java.util.logging.Level;
 
-public class VehicleMoveEventListener implements Listener {
+public class VehicleUpdateEventListener implements Listener {
 	private final GlobalChunkManager chunkManager;
 	private final Set<EntityType> entityTypes;
 	private final double speedThreshold;
 	private final int updateInterval;
 	
-	public VehicleMoveEventListener(GlobalChunkManager chunkManager, Set<EntityType> entityTypes, double speedThreshold, int updateInterval) {
+	public VehicleUpdateEventListener(GlobalChunkManager chunkManager, Set<EntityType> entityTypes, double speedThreshold, int updateInterval) {
 		this.chunkManager = chunkManager;
 		this.entityTypes = entityTypes;
 		this.speedThreshold = speedThreshold;
@@ -32,7 +32,7 @@ public class VehicleMoveEventListener implements Listener {
 	public void onVehicleMove(VehicleMoveEvent event) {
 		Vehicle vehicle = event.getVehicle();
 		// Ignore non-specified and non-custom vehicles
-		if (!entityTypes.contains(vehicle.getType()) && !CustomMinecart.isEntity(vehicle)) return;
+		if (!isValid(vehicle)) return;
 		
 		double speed = vehicle.getVelocity().length();
 		int ticks = vehicle.getTicksLived();
@@ -44,11 +44,10 @@ public class VehicleMoveEventListener implements Listener {
 		}
 	}
 	
-	
 	@EventHandler
 	public void onVehicleCreate(VehicleCreateEvent event) {
 		Vehicle vehicle = event.getVehicle();
-		if (!entityTypes.contains(vehicle.getType())) return;
+		if (!isValid(vehicle)) return;
 		
 		CartLoader.log(Level.INFO, "Created " + vehicle.getUniqueId());
 		chunkManager.onEntityCreated(vehicle);
@@ -57,9 +56,13 @@ public class VehicleMoveEventListener implements Listener {
 	@EventHandler
 	public void onVehicleDestroy(VehicleDestroyEvent event) {
 		Vehicle vehicle = event.getVehicle();
-		if (!entityTypes.contains(vehicle.getType())) return;
+		if (!isValid(vehicle)) return;
 		
 		CartLoader.log(Level.INFO, "Destroyed " + vehicle.getUniqueId());
 		chunkManager.onEntityDestroyed(vehicle);
+	}
+	
+	private boolean isValid(Vehicle vehicle) {
+		return entityTypes.contains(vehicle.getType()) || CustomMinecart.isEntity(vehicle);
 	}
 }

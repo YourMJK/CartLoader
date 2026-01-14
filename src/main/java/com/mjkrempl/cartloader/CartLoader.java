@@ -9,8 +9,8 @@ import com.mjkrempl.cartloader.ChunkManagement.WorldSavedState;
 import com.mjkrempl.cartloader.Commands.CartLoaderCommand;
 import com.mjkrempl.cartloader.Commands.GiveSubcommand;
 import com.mjkrempl.cartloader.Commands.HelpSubcommand;
-import com.mjkrempl.cartloader.Events.VehicleDropItemEventListener;
-import com.mjkrempl.cartloader.Events.VehicleMoveEventListener;
+import com.mjkrempl.cartloader.Events.VehicleDestroyEventListener;
+import com.mjkrempl.cartloader.Events.VehicleUpdateEventListener;
 
 import org.bukkit.World;
 import org.bukkit.command.CommandExecutor;
@@ -87,13 +87,13 @@ public final class CartLoader extends JavaPlugin {
 		if (config.minecartCommandBlock) vehicleEventEntityTypes.add(EntityType.COMMAND_BLOCK_MINECART);
 		
 		// Register event handlers
-		registerEventListener(new VehicleMoveEventListener(
+		registerEventListener(new VehicleUpdateEventListener(
 			chunkManager,
 			vehicleEventEntityTypes,
 			config.speedThreshold,
 			config.updateInterval
 		));
-		registerEventListener(new VehicleDropItemEventListener());
+		registerEventListener(new VehicleDestroyEventListener());
 		registerEventListener(new ChunkEventListener(this, chunkManager));
 		registerEventListener(new PlayerEventListener(this, chunkManager));
 		

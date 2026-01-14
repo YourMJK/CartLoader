@@ -1,4 +1,4 @@
-package com.mjkrempl.cartloader;
+package com.mjkrempl.cartloader.Minecart;
 
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;

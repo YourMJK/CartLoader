@@ -1,4 +1,4 @@
-package com.mjkrempl.cartloader;
+package com.mjkrempl.cartloader.Minecart;
 
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
