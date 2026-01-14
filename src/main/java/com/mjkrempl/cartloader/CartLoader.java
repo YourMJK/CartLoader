@@ -10,6 +10,7 @@ import com.mjkrempl.cartloader.Commands.HelpSubcommand;
 import com.mjkrempl.cartloader.Events.VehicleDestroyEventListener;
 import com.mjkrempl.cartloader.Events.VehicleMoveEventListener;
 
+import com.mjkrempl.cartloader.Minecart.CustomMinecartEntityCache;
 import org.bukkit.World;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
@@ -76,6 +77,7 @@ public final class CartLoader extends JavaPlugin {
 		chunkManager = new GlobalChunkManager(this, lastSavedState, managerConfig);
 		
 		Set<EntityType> vehicleEventEntityTypes = new HashSet<>();
+		CustomMinecartEntityCache vehicleEventEntityCache = new CustomMinecartEntityCache();
 		if (config.minecart) vehicleEventEntityTypes.add(EntityType.MINECART);
 		if (config.minecartChest) vehicleEventEntityTypes.add(EntityType.CHEST_MINECART);
 		if (config.minecartFurnace) vehicleEventEntityTypes.add(EntityType.FURNACE_MINECART);
@@ -88,10 +90,11 @@ public final class CartLoader extends JavaPlugin {
 		registerEventListener(new VehicleMoveEventListener(
 			chunkManager,
 			vehicleEventEntityTypes,
+			vehicleEventEntityCache,
 			config.speedThreshold,
 			config.updateInterval
 		));
-		registerEventListener(new VehicleDestroyEventListener());
+		registerEventListener(new VehicleDestroyEventListener(vehicleEventEntityCache));
 		
 		// Register commands
 		final String cmdLabel = "cartloader";

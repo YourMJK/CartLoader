@@ -2,7 +2,7 @@ package com.mjkrempl.cartloader.Events;
 
 import com.mjkrempl.cartloader.ChunkManagement.GlobalChunkManager;
 
-import com.mjkrempl.cartloader.CustomMinecart;
+import com.mjkrempl.cartloader.Minecart.CustomMinecartEntityCache;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -14,12 +14,14 @@ import java.util.Set;
 public class VehicleMoveEventListener implements Listener {
 	private final GlobalChunkManager chunkManager;
 	private final Set<EntityType> entityTypes;
+	private final CustomMinecartEntityCache entityCache;
 	private final double speedThreshold;
 	private final int updateInterval;
 	
-	public VehicleMoveEventListener(GlobalChunkManager chunkManager, Set<EntityType> entityTypes, double speedThreshold, int updateInterval) {
+	public VehicleMoveEventListener(GlobalChunkManager chunkManager, Set<EntityType> entityTypes, CustomMinecartEntityCache entityCache, double speedThreshold, int updateInterval) {
 		this.chunkManager = chunkManager;
 		this.entityTypes = entityTypes;
+		this.entityCache = entityCache;
 		this.speedThreshold = speedThreshold;
 		this.updateInterval = updateInterval;
 	}
@@ -28,7 +30,7 @@ public class VehicleMoveEventListener implements Listener {
 	public void onVehicleMove(VehicleMoveEvent event) {
 		Vehicle vehicle = event.getVehicle();
 		// Ignore non-specified and non-custom vehicles
-		if (!entityTypes.contains(vehicle.getType()) && !CustomMinecart.isEntity(vehicle)) return;
+		if (!entityTypes.contains(vehicle.getType()) && !entityCache.isCustomMinecart(vehicle)) return;
 		
 		double speed = vehicle.getVelocity().length();
 		int ticks = vehicle.getTicksLived();
