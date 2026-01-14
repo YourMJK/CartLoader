@@ -4,10 +4,16 @@ import com.mjkrempl.cartloader.ChunkManagement.ChunkManagerConfiguration;
 import com.mjkrempl.cartloader.ChunkManagement.GlobalChunkManager;
 import com.mjkrempl.cartloader.ChunkManagement.GlobalSavedState;
 import com.mjkrempl.cartloader.ChunkManagement.WorldSavedState;
+import com.mjkrempl.cartloader.Commands.CartLoaderCommand;
+import com.mjkrempl.cartloader.Commands.GiveSubcommand;
+import com.mjkrempl.cartloader.Commands.HelpSubcommand;
 import com.mjkrempl.cartloader.Events.VehicleDropItemEventListener;
 import com.mjkrempl.cartloader.Events.VehicleMoveEventListener;
 
 import org.bukkit.World;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -86,6 +92,13 @@ public final class CartLoader extends JavaPlugin {
 			config.updateInterval
 		));
 		registerEventListener(new VehicleDropItemEventListener());
+		
+		// Register commands
+		final String cmdLabel = "cartloader";
+		CartLoaderCommand cmd = new CartLoaderCommand(this, cmdLabel);
+		registerCommand(cmdLabel, cmd, cmd);
+		cmd.registerSubcommand("help", new HelpSubcommand(cmd));
+		cmd.registerSubcommand("give", new GiveSubcommand(getServer()));
 	}
 	
 	@Override
@@ -110,6 +123,12 @@ public final class CartLoader extends JavaPlugin {
 	
 	private void registerEventListener(Listener listener) {
 		getServer().getPluginManager().registerEvents(listener, this);
+	}
+	
+	private void registerCommand(String label, CommandExecutor executor, TabCompleter completer) {
+		PluginCommand command = Objects.requireNonNull(getCommand(label));
+		command.setExecutor(executor);
+		command.setTabCompleter(completer);
 	}
 	
 	
