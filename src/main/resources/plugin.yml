@@ -7,3 +7,14 @@ author: YourMJK
 website: https://github.com/YourMJK/CartLoader
 
 depend: [NBTAPI]
+
+commands:
+  cartloader:
+    description: All CartLoader subcommands
+    permission: cartloader
+    usage: /<command> (help|give)
+
+permissions:
+  cartloader:
+    description: Allows the /cartloader command
+    default: op
