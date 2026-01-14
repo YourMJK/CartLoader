@@ -7,7 +7,7 @@ import com.mjkrempl.cartloader.ChunkManagement.WorldSavedState;
 import com.mjkrempl.cartloader.Commands.CartLoaderCommand;
 import com.mjkrempl.cartloader.Commands.GiveSubcommand;
 import com.mjkrempl.cartloader.Commands.HelpSubcommand;
-import com.mjkrempl.cartloader.Events.VehicleDropItemEventListener;
+import com.mjkrempl.cartloader.Events.VehicleDestroyEventListener;
 import com.mjkrempl.cartloader.Events.VehicleMoveEventListener;
 
 import org.bukkit.World;
@@ -91,7 +91,7 @@ public final class CartLoader extends JavaPlugin {
 			config.speedThreshold,
 			config.updateInterval
 		));
-		registerEventListener(new VehicleDropItemEventListener());
+		registerEventListener(new VehicleDestroyEventListener());
 		
 		// Register commands
 		final String cmdLabel = "cartloader";

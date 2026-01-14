@@ -1,7 +1,7 @@
 package com.mjkrempl.cartloader.Events;
 
-import com.mjkrempl.cartloader.CustomMinecart;
-import com.mjkrempl.cartloader.MinecartType;
+import com.mjkrempl.cartloader.Minecart.CustomMinecart;
+import com.mjkrempl.cartloader.Minecart.MinecartType;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -10,7 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class VehicleDropItemEventListener implements Listener {
+public class VehicleDestroyEventListener implements Listener {
 	@EventHandler
 	public void onEntityDropItem(EntityDropItemEvent event) {
 		Entity entity = event.getEntity();

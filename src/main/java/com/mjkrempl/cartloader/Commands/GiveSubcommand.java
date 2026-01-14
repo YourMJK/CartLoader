@@ -1,8 +1,8 @@
 package com.mjkrempl.cartloader.Commands;
 
 import com.mjkrempl.cartloader.CartLoader;
-import com.mjkrempl.cartloader.CustomMinecart;
-import com.mjkrempl.cartloader.MinecartType;
+import com.mjkrempl.cartloader.Minecart.CustomMinecart;
+import com.mjkrempl.cartloader.Minecart.MinecartType;
 import org.bukkit.Server;
 import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
