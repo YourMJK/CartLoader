@@ -13,9 +13,9 @@ import org.bukkit.inventory.ItemStack;
 public class VehicleDestroyEventListener implements Listener {
 	@EventHandler
 	public void onEntityDropItem(EntityDropItemEvent event) {
+		// Ignore non-custom vehicles (not using cache)
 		Entity entity = event.getEntity();
-		boolean isCustomMinecart = CustomMinecart.isEntity(entity);
-		if (!isCustomMinecart) return;
+		if (!CustomMinecart.isEntity(entity)) return;
 		
 		// Replace item with custom minecart item
 		Item item = event.getItemDrop();

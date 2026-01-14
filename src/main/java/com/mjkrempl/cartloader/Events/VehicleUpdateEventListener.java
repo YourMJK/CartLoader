@@ -3,7 +3,7 @@ package com.mjkrempl.cartloader.Events;
 import com.mjkrempl.cartloader.CartLoader;
 import com.mjkrempl.cartloader.ChunkManagement.GlobalChunkManager;
 
-import com.mjkrempl.cartloader.Minecart.CustomMinecart;
+import com.mjkrempl.cartloader.Minecart.CustomMinecartEntityCache;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -18,12 +18,14 @@ import java.util.logging.Level;
 public class VehicleUpdateEventListener implements Listener {
 	private final GlobalChunkManager chunkManager;
 	private final Set<EntityType> entityTypes;
+	private final CustomMinecartEntityCache entityCache;
 	private final double speedThreshold;
 	private final int updateInterval;
 	
-	public VehicleUpdateEventListener(GlobalChunkManager chunkManager, Set<EntityType> entityTypes, double speedThreshold, int updateInterval) {
+	public VehicleUpdateEventListener(GlobalChunkManager chunkManager, Set<EntityType> entityTypes, CustomMinecartEntityCache entityCache, double speedThreshold, int updateInterval) {
 		this.chunkManager = chunkManager;
 		this.entityTypes = entityTypes;
+		this.entityCache = entityCache;
 		this.speedThreshold = speedThreshold;
 		this.updateInterval = updateInterval;
 	}
@@ -56,6 +58,10 @@ public class VehicleUpdateEventListener implements Listener {
 	@EventHandler
 	public void onVehicleDestroy(VehicleDestroyEvent event) {
 		Vehicle vehicle = event.getVehicle();
+		
+		// Remove vehicle from cache
+		entityCache.remove(vehicle);
+		
 		if (!isValid(vehicle)) return;
 		
 		CartLoader.log(Level.INFO, "Destroyed " + vehicle.getUniqueId());
@@ -63,6 +69,6 @@ public class VehicleUpdateEventListener implements Listener {
 	}
 	
 	private boolean isValid(Vehicle vehicle) {
-		return entityTypes.contains(vehicle.getType()) || CustomMinecart.isEntity(vehicle);
+		return entityTypes.contains(vehicle.getType()) || entityCache.isCustomMinecart(vehicle);
 	}
 }
