@@ -2,6 +2,7 @@ package com.mjkrempl.cartloader.Minecart;
 
 import de.tr7zw.nbtapi.NBT;
 import de.tr7zw.nbtapi.iface.ReadableNBT;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
@@ -53,8 +54,9 @@ public final class CustomMinecart {
 		assert meta != null;
 		
 		List<String> lore = new ArrayList<>();
-		lore.add("Chunk Loading");
+		lore.add(ChatColor.DARK_GREEN.toString() + ChatColor.ITALIC + "Chunk Loading");
 		meta.setLore(lore);
+		//meta.setRarity(ItemRarity.UNCOMMON);
 		item.setItemMeta(meta);
 		
 		return item;
