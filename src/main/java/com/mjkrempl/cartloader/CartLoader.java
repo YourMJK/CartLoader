@@ -133,7 +133,7 @@ public final class CartLoader extends JavaPlugin {
 		if (!config.enabled) return;
 		
 		// Save current chunk manager states
-		if (config.restoreRegionsAfterRestart) {
+		if (config.restoreRegionsAfterRestart && chunkManager != null && stateStorage != null) {
 			getLogger().log(Level.INFO, "Saving state");
 			GlobalSavedState savedStates = chunkManager.getSavedStates();
 			stateStorage.save(savedStates);
