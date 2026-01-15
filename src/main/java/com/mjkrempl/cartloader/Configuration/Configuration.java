@@ -35,6 +35,7 @@ public class Configuration {
 	private static final String filenameBackup = filename + ".old";
 
 	public Configuration(JavaPlugin plugin) {
+		plugin.reloadConfig();
 		FileConfiguration config = plugin.getConfig();
 
 		this.enabled = config.getBoolean("enabled", true);
@@ -122,7 +123,9 @@ public class Configuration {
 		
 		Map<String, Object> values = oldConfigYaml.getValues(true);
 		values.remove(configVersionKey);
-		values.forEach(newConfigYaml::set);
+		values.entrySet().stream()
+			.filter(entry -> !(entry.getValue() instanceof org.simpleyaml.configuration.ConfigurationSection))
+			.forEach(entry -> newConfigYaml.set(entry.getKey(), entry.getValue()));
 		
 		newConfigYaml.save();
 	}
