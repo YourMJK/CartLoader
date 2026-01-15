@@ -12,17 +12,18 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 
+import javax.annotation.Nullable;
 import java.util.Set;
 import java.util.logging.Level;
 
 public class VehicleUpdateEventListener implements Listener {
 	private final GlobalChunkManager chunkManager;
-	private final Set<EntityType> entityTypes;
-	private final CustomMinecartEntityCache entityCache;
+	private final @Nullable Set<EntityType> entityTypes;
+	private final @Nullable CustomMinecartEntityCache entityCache;
 	private final double speedThreshold;
 	private final int updateInterval;
 	
-	public VehicleUpdateEventListener(GlobalChunkManager chunkManager, Set<EntityType> entityTypes, CustomMinecartEntityCache entityCache, double speedThreshold, int updateInterval) {
+	public VehicleUpdateEventListener(GlobalChunkManager chunkManager, @Nullable Set<EntityType> entityTypes, @Nullable CustomMinecartEntityCache entityCache, double speedThreshold, int updateInterval) {
 		this.chunkManager = chunkManager;
 		this.entityTypes = entityTypes;
 		this.entityCache = entityCache;
@@ -60,7 +61,9 @@ public class VehicleUpdateEventListener implements Listener {
 		Vehicle vehicle = event.getVehicle();
 		
 		// Remove vehicle from cache
-		entityCache.remove(vehicle);
+		if (entityCache != null) {
+			entityCache.remove(vehicle);
+		}
 		
 		if (!isValid(vehicle)) return;
 		
@@ -68,7 +71,16 @@ public class VehicleUpdateEventListener implements Listener {
 		chunkManager.onEntityDestroyed(vehicle);
 	}
 	
+	
 	private boolean isValid(Vehicle vehicle) {
-		return entityTypes.contains(vehicle.getType()) || entityCache.isCustomMinecart(vehicle);
+		return isSpecifiedMinecartType(vehicle) || isCustomMinecart(vehicle);
+	}
+	
+	private boolean isSpecifiedMinecartType(Vehicle vehicle) {
+		return entityTypes != null && entityTypes.contains(vehicle.getType());
+	}
+	
+	private boolean isCustomMinecart(Vehicle vehicle) {
+		return entityCache != null && entityCache.isCustomMinecart(vehicle);
 	}
 }

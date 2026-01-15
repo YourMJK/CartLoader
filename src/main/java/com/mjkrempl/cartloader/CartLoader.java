@@ -9,6 +9,7 @@ import com.mjkrempl.cartloader.ChunkManagement.WorldSavedState;
 import com.mjkrempl.cartloader.Commands.CartLoaderCommand;
 import com.mjkrempl.cartloader.Commands.GiveSubcommand;
 import com.mjkrempl.cartloader.Commands.HelpSubcommand;
+import com.mjkrempl.cartloader.Configuration.Configuration;
 import com.mjkrempl.cartloader.Events.VehicleDestroyEventListener;
 import com.mjkrempl.cartloader.Events.VehicleUpdateEventListener;
 
@@ -81,15 +82,19 @@ public final class CartLoader extends JavaPlugin {
 		ChunkManagerConfiguration managerConfig = new ChunkManagerConfiguration(config.regionRadius, config.keepLastRegionLoadedTime, config.updateInterval);
 		chunkManager = new GlobalChunkManager(this, lastSavedState, managerConfig);
 		
+		// Setup entity types
 		Set<EntityType> vehicleEventEntityTypes = new HashSet<>();
-		CustomMinecartEntityCache vehicleEventEntityCache = new CustomMinecartEntityCache();
-		if (config.minecart) vehicleEventEntityTypes.add(EntityType.MINECART);
-		if (config.minecartChest) vehicleEventEntityTypes.add(EntityType.CHEST_MINECART);
-		if (config.minecartFurnace) vehicleEventEntityTypes.add(EntityType.FURNACE_MINECART);
-		if (config.minecartTNT) vehicleEventEntityTypes.add(EntityType.TNT_MINECART);
-		if (config.minecartHopper) vehicleEventEntityTypes.add(EntityType.HOPPER_MINECART);
-		if (config.minecartSpawner) vehicleEventEntityTypes.add(EntityType.SPAWNER_MINECART);
-		if (config.minecartCommandBlock) vehicleEventEntityTypes.add(EntityType.COMMAND_BLOCK_MINECART);
+		if (config.vanillaMinecarts.normal) vehicleEventEntityTypes.add(EntityType.MINECART);
+		if (config.vanillaMinecarts.chest) vehicleEventEntityTypes.add(EntityType.CHEST_MINECART);
+		if (config.vanillaMinecarts.furnace) vehicleEventEntityTypes.add(EntityType.FURNACE_MINECART);
+		if (config.vanillaMinecarts.tnt) vehicleEventEntityTypes.add(EntityType.TNT_MINECART);
+		if (config.vanillaMinecarts.hopper) vehicleEventEntityTypes.add(EntityType.HOPPER_MINECART);
+		if (config.vanillaMinecarts.spawner) vehicleEventEntityTypes.add(EntityType.SPAWNER_MINECART);
+		if (config.vanillaMinecarts.commandBlock) vehicleEventEntityTypes.add(EntityType.COMMAND_BLOCK_MINECART);
+		
+		// Determine whether vanilla and custom minecarts checks are needed at all, disable checks if not
+		if (vehicleEventEntityTypes.isEmpty()) vehicleEventEntityTypes = null;
+		CustomMinecartEntityCache vehicleEventEntityCache = config.customMinecarts.enabled ? new CustomMinecartEntityCache() : null;
 		
 		// Register event handlers
 		registerEventListener(new VehicleUpdateEventListener(
@@ -99,7 +104,9 @@ public final class CartLoader extends JavaPlugin {
 			config.speedThreshold,
 			config.updateInterval
 		));
-		registerEventListener(new VehicleDestroyEventListener());
+		if (config.customMinecarts.enabled) {
+			registerEventListener(new VehicleDestroyEventListener());
+		}
 		registerEventListener(new ChunkEventListener(this, chunkManager));
 		registerEventListener(new PlayerEventListener(this, chunkManager));
 		
@@ -108,12 +115,16 @@ public final class CartLoader extends JavaPlugin {
 		CartLoaderCommand cmd = new CartLoaderCommand(this, cmdLabel);
 		registerCommand(cmdLabel, cmd, cmd);
 		cmd.registerSubcommand("help", new HelpSubcommand(cmd));
-		cmd.registerSubcommand("give", new GiveSubcommand(getServer()));
+		if (config.customMinecarts.enabled) {
+			cmd.registerSubcommand("give", new GiveSubcommand(getServer()));
+		}
 		
 		// Register recipes
-		Material ingredient = Material.MAP;
-		for (MinecartType type : MinecartType.all) {
-			registerRecipe(CustomMinecart.getRecipe(type, ingredient, this));
+		if (config.customMinecarts.craftable) {
+			Material ingredient = config.customMinecarts.craftingRecipeIngredient;
+			for (MinecartType type : MinecartType.all) {
+				registerRecipe(CustomMinecart.getRecipe(type, ingredient, this));
+			}
 		}
 	}
 	
