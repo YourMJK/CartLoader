@@ -12,13 +12,16 @@ import com.mjkrempl.cartloader.Commands.HelpSubcommand;
 import com.mjkrempl.cartloader.Events.VehicleDestroyEventListener;
 import com.mjkrempl.cartloader.Events.VehicleUpdateEventListener;
 
+import com.mjkrempl.cartloader.Minecart.CustomMinecart;
 import com.mjkrempl.cartloader.Minecart.CustomMinecartEntityCache;
-import org.bukkit.World;
+import com.mjkrempl.cartloader.Minecart.MinecartType;
+import org.bukkit.*;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.CraftingRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -101,11 +104,17 @@ public final class CartLoader extends JavaPlugin {
 		registerEventListener(new PlayerEventListener(this, chunkManager));
 		
 		// Register commands
-		final String cmdLabel = "cartloader";
+		String cmdLabel = "cartloader";
 		CartLoaderCommand cmd = new CartLoaderCommand(this, cmdLabel);
 		registerCommand(cmdLabel, cmd, cmd);
 		cmd.registerSubcommand("help", new HelpSubcommand(cmd));
 		cmd.registerSubcommand("give", new GiveSubcommand(getServer()));
+		
+		// Register recipes
+		Material ingredient = Material.MAP;
+		for (MinecartType type : MinecartType.all) {
+			registerRecipe(CustomMinecart.getRecipe(type, ingredient, this));
+		}
 	}
 	
 	@Override
@@ -136,6 +145,10 @@ public final class CartLoader extends JavaPlugin {
 		PluginCommand command = Objects.requireNonNull(getCommand(label));
 		command.setExecutor(executor);
 		command.setTabCompleter(completer);
+	}
+	
+	private void registerRecipe(CraftingRecipe recipe) {
+		Bukkit.addRecipe(recipe);
 	}
 	
 	
