@@ -1,10 +1,17 @@
-package com.mjkrempl.cartloader;
+package com.mjkrempl.cartloader.Configuration;
 
+import com.mjkrempl.cartloader.CartLoader;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.simpleyaml.configuration.file.YamlFile;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,13 +21,8 @@ import java.util.logging.Level;
 
 public class Configuration {
 	public final boolean enabled;
-	public final boolean minecart;
-	public final boolean minecartChest;
-	public final boolean minecartFurnace;
-	public final boolean minecartTNT;
-	public final boolean minecartHopper;
-	public final boolean minecartSpawner;
-	public final boolean minecartCommandBlock;
+	public final VanillaMinecartConfiguration vanillaMinecarts;
+	public final CustomMinecartConfiguration customMinecarts;
 	public final int regionRadius;
 	public final int keepLastRegionLoadedTime;
 	public final boolean restoreRegionsAfterRestart;
@@ -37,28 +39,40 @@ public class Configuration {
 
 		this.enabled = config.getBoolean("enabled", true);
 		
-		this.minecart = config.getBoolean("minecarts.normal", false);
-		this.minecartChest = config.getBoolean("minecarts.chest", true);
-		this.minecartFurnace = config.getBoolean("minecarts.furnace", true);
-		this.minecartTNT = config.getBoolean("minecarts.tnt", true);
-		this.minecartHopper = config.getBoolean("minecarts.hopper", true);
-		this.minecartSpawner = config.getBoolean("minecarts.spawner", true);
-		this.minecartCommandBlock = config.getBoolean("minecarts.command-block", true);
+		this.vanillaMinecarts = new VanillaMinecartConfiguration(getConfigurationSection(config, "minecarts"));
+		this.customMinecarts = new CustomMinecartConfiguration(getConfigurationSection(config, "custom-minecarts"));
 		
 		this.regionRadius = getClampedInt(plugin, "region-radius", 2, 1);
 		this.keepLastRegionLoadedTime = getClampedInt(plugin, "keep-last-region-loaded-time", 600, 0);
 		this.restoreRegionsAfterRestart = config.getBoolean("restore-regions-after-restart", true);
 		this.updateInterval = getClampedInt(plugin, "update-interval", 8, 1);
 		this.speedThreshold = config.getDouble("speed-threshold", 0.001);
+		
 		this.configVersion = config.getInt("config-version");
 	}
 	
-	private static int getClampedInt(JavaPlugin plugin, String path, int def, int min) {
+	public static ConfigurationSection getConfigurationSection(ConfigurationSection config, String path) {
+		ConfigurationSection section = config.getConfigurationSection(path);
+		if (section == null) return new MemoryConfiguration();
+		return section;
+	}
+	
+	public static int getClampedInt(JavaPlugin plugin, String path, int def, int min) {
 		int value = plugin.getConfig().getInt(path, def);
 		if (value >= min) return value;
 		
-		plugin.getLogger().log(Level.WARNING, "Config value \"" + path + "\" needs to be at least " + min + "!");
+		CartLoader.log(Level.WARNING, "Config value \"" + path + "\" needs to be at least " + min + "!");
 		return min;
+	}
+	
+	public static @Nullable Material getMaterialFromKey(String keyString) {
+		NamespacedKey key = NamespacedKey.fromString(keyString);
+		if (key == null) return null;
+		Material material = Registry.MATERIAL.get(key);
+		if (material != null) return material;
+		
+		CartLoader.log(Level.SEVERE, "Invalid item ID \"" + keyString + "\"! Must be a valid resource location like \"minecraft:map\".");
+		return null;
 	}
 	
 	
@@ -111,5 +125,21 @@ public class Configuration {
 		values.forEach(newConfigYaml::set);
 		
 		newConfigYaml.save();
+	}
+	
+	
+	@Override
+	public String toString() {
+		return "{" +
+			"enabled=" + enabled +
+			", vanillaMinecarts=" + vanillaMinecarts +
+			", customMinecarts=" + customMinecarts +
+			", regionRadius=" + regionRadius +
+			", keepLastRegionLoadedTime=" + keepLastRegionLoadedTime +
+			", restoreRegionsAfterRestart=" + restoreRegionsAfterRestart +
+			", updateInterval=" + updateInterval +
+			", speedThreshold=" + speedThreshold +
+			", configVersion=" + configVersion +
+			'}';
 	}
 }

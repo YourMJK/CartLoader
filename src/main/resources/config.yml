@@ -1,7 +1,8 @@
 # Enable/disable functionality of this plugin.
 enabled: true
 
-# Configure which types of moving minecarts should load chunks.
+# Configure which types of moving vanilla minecarts should load chunks.
+# These settings have no effect on the custom minecarts.
 minecarts:
   normal: false
   chest: true
@@ -10,6 +11,22 @@ minecarts:
   hopper: true
   spawner: true
   command-block: true
+
+# Configure the custom "chunk loading" minecarts introduced by this plugin.
+# When moving, these will always load chunks, regardless of the above settings for vanilla minecarts.
+custom-minecarts:
+  
+  # Whether to check for the custom minecart entities and make their items available (e.g. through "/cartloader give" OP command).
+  # If not needed, disable this for a slight performance increase.
+  enabled: true
+  
+  # Whether the custom minecarts should be available to everyone through the crafting recipe.
+  craftable: false
+  
+  # Configure the shapeless crafting recipe consisting of some type of minecart and the following ingredient
+  # to get a corresponding custom chunk loading minecart.
+  crafting-recipe-ingredient: 'minecraft:map'
+
 
 # Radius of the region of chunks around a moving minecart to load (in chunks).
 # Region will be a square of side length (radius*2 + 1) with the minecart's current chunk in the center.
@@ -30,5 +47,6 @@ update-interval: 8
 # Threshold below which speed a minecart is considered to be stationary (in blocks per tick).
 speed-threshold: 0.001
 
+
 # Don't modify this.
-config-version: 2
+config-version: 3
