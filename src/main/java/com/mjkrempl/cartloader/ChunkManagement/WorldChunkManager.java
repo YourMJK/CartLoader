@@ -1,5 +1,6 @@
 package com.mjkrempl.cartloader.ChunkManagement;
 
+import com.mjkrempl.cartloader.CartLoader;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -158,11 +159,11 @@ public final class WorldChunkManager {
 	}
 	
 	public void onChunkTicketAdd(int x, int z) {
-		plugin.getLogger().log(Level.INFO, "ADD " + x + " " + z);
+		//CartLoader.log(Level.INFO, "ADD " + x + " " + z);
 		chunkLoadVisualizer.onChunkTicketAdd(x, z);
 	}
 	public void onChunkTicketRemove(int x, int z) {
-		plugin.getLogger().log(Level.INFO, "REMOVE " + x + " " + z);
+		//CartLoader.log(Level.INFO, "REMOVE " + x + " " + z);
 		chunkLoadVisualizer.onChunkTicketRemove(x, z);
 	}
 	

@@ -56,9 +56,9 @@ public final class CartLoader extends JavaPlugin {
 		
 		// Load last chunk manager states
 		if (config.restoreRegionsAfterRestart) {
-			getLogger().log(Level.INFO, "Loading saved state");
+			log(Level.INFO, "Loading saved state");
 			File stateStorageDirectory = new File(getDataFolder(), "saved-states");
-			stateStorage = new StateStorage(stateStorageDirectory, getLogger());
+			stateStorage = new StateStorage(stateStorageDirectory);
 			lastSavedState = stateStorage.load();
 		}
 	}
@@ -72,7 +72,7 @@ public final class CartLoader extends JavaPlugin {
 		
 		// Log number of restored regions per world from saved state
 		if (lastSavedState != null && !lastSavedState.worldStates.isEmpty()) {
-			getLogger().log(Level.INFO, "Restored saved state");
+			log(Level.INFO, "Restored saved state");
 			lastSavedState.worldStates.forEach((worldUID, worldState) -> {
 				logRegionsInWorldState(worldUID, worldState, "Loading");
 			});
@@ -134,7 +134,7 @@ public final class CartLoader extends JavaPlugin {
 		
 		// Save current chunk manager states
 		if (config.restoreRegionsAfterRestart && chunkManager != null && stateStorage != null) {
-			getLogger().log(Level.INFO, "Saving state");
+			log(Level.INFO, "Saving state");
 			GlobalSavedState savedStates = chunkManager.getSavedStates();
 			stateStorage.save(savedStates);
 			
@@ -167,7 +167,7 @@ public final class CartLoader extends JavaPlugin {
 	
 	private static Logger logger;
 	
-	public static void log(java.util.logging.Level level, Object... items) {
+	public static void log(Level level, Object... items) {
 		String message = Arrays.stream(items)
 			.map(o -> o == null ? "(null)" : o)
 			.map(Object::toString)

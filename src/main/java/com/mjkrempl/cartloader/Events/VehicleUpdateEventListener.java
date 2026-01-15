@@ -42,7 +42,7 @@ public class VehicleUpdateEventListener implements Listener {
 		
 		// Only update chunks occasionally and only for significantly moving vehicles
 		if (speed >= speedThreshold && ticks % updateInterval == 0) {
-			//plugin.getLogger().log(Level.INFO, "Moving " + vehicle.getUniqueId() + ": " + ticks + " " + Math.round(speed*100)/100.0 + " " + vehicle.getLocation());
+			CartLoader.log(Level.INFO, "Moving " + vehicle.getUniqueId() + ": " + ticks + " " + Math.round(speed*100)/100.0 + " " + vehicle.getLocation());
 			chunkManager.onEntityActivity(vehicle);
 		}
 	}

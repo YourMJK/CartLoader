@@ -90,11 +90,11 @@ public class Configuration {
 		// Migrate if current version is older
 		if (currentVersion >= newVersion) return;
 		try {
-			plugin.getLogger().log(Level.INFO, "Migrating config file from version " + currentVersion + " to " + newVersion);
+			CartLoader.log(Level.INFO, "Migrating config file from version " + currentVersion + " to " + newVersion);
 			migrate(plugin);
 		}
 		catch (Exception e) {
-			plugin.getLogger().log(Level.SEVERE, "Couldn't migrate config file from version " + currentVersion + " to " + newVersion + ": " + e.getMessage());
+			CartLoader.log(Level.SEVERE, "Couldn't migrate config file from version " + currentVersion + " to " + newVersion + ": " + e.getMessage());
 		}
 	}
 	
