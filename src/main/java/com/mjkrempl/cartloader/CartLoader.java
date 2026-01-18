@@ -8,6 +8,7 @@ import com.mjkrempl.cartloader.Commands.CartLoaderCommand;
 import com.mjkrempl.cartloader.Commands.GiveSubcommand;
 import com.mjkrempl.cartloader.Commands.HelpSubcommand;
 import com.mjkrempl.cartloader.Configuration.Configuration;
+import com.mjkrempl.cartloader.Events.VehicleCreateEventListener;
 import com.mjkrempl.cartloader.Events.VehicleDestroyEventListener;
 import com.mjkrempl.cartloader.Events.VehicleMoveEventListener;
 
@@ -30,6 +31,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public final class CartLoader extends JavaPlugin {
+	private static final String nonLegacySupportGameVersion = "1.21.5";
+	
 	private Configuration config;
 	private StateStorage stateStorage;
 	private GlobalSavedState lastSavedState;
@@ -38,6 +41,8 @@ public final class CartLoader extends JavaPlugin {
 	public CartLoader() {
 		super();
 		logger = getLogger();
+		
+		CustomMinecart.setNamespace(this);
 	}
 	
 	
@@ -67,6 +72,10 @@ public final class CartLoader extends JavaPlugin {
 			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
+		
+		// Check game version if legacy support is needed
+		final boolean legacySupport = checkGameVersionNeedsLegacySupport();
+		CustomMinecart.setLegacySupport(legacySupport);
 		
 		// Log number of restored regions per world from saved state
 		if (lastSavedState != null && !lastSavedState.worldStates.isEmpty()) {
@@ -103,6 +112,7 @@ public final class CartLoader extends JavaPlugin {
 			config.updateInterval
 		));
 		if (config.customMinecarts.enabled) {
+			if (legacySupport) registerEventListener(new VehicleCreateEventListener());
 			registerEventListener(new VehicleDestroyEventListener(vehicleEventEntityCache));
 		}
 		
@@ -156,6 +166,62 @@ public final class CartLoader extends JavaPlugin {
 	
 	private void registerRecipe(CraftingRecipe recipe) {
 		Bukkit.addRecipe(recipe);
+	}
+	
+	
+	// - Version
+	
+	private boolean checkGameVersionNeedsLegacySupport() {
+		String mcVersion = getMCVersion();
+		Integer comparison = compareVersions(mcVersion, nonLegacySupportGameVersion);
+		
+		if (comparison == null) {
+			log(Level.WARNING, "Unable to determine game version to check for legacy support");
+			return false;
+		}
+		boolean legacySupport = comparison < 0;
+		if (legacySupport) {
+			log(Level.INFO, "Enabling legacy support for game version " + mcVersion);
+		}
+		
+		return legacySupport;
+	}
+	
+	private String getMCVersion() {
+		String version = getServer().getBukkitVersion();
+		String[] versionComponents = version.split("-");
+		if (versionComponents.length == 0) return null;
+		return versionComponents[0];
+	}
+	
+	private static Integer compareVersions(String aVersion, String bVersion) {
+		int[] a = getVersionComponents(aVersion, 3);
+		int[] b = getVersionComponents(bVersion, 3);
+		if (a == null || b == null) return null;
+		
+		if (a[0] < b[0]) return -3;
+		if (a[0] > b[0]) return +3;
+		if (a[1] < b[1]) return -2;
+		if (a[1] > b[1]) return +2;
+		if (a[2] < b[2]) return -1;
+		if (a[2] > b[2]) return +1;
+		return 0;
+	}
+	
+	private static int[] getVersionComponents(String version, int n) {
+		if (version == null) return null;
+		String[] strings = version.split("\\.");
+		int[] ints = new int[n];
+		
+		try {
+			for (int i = 0; i < strings.length; i++) {
+				ints[i] = Integer.parseInt(strings[i]);
+			}
+		} catch (Exception e) {
+			return null;
+		}
+		
+		return ints;
 	}
 	
 	
