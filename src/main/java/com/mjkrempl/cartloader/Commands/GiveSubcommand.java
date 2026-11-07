@@ -1,6 +1,7 @@
 package com.mjkrempl.cartloader.Commands;
 
 import com.mjkrempl.cartloader.CartLoader;
+import com.mjkrempl.cartloader.FoliaSupport;
 import com.mjkrempl.cartloader.Minecart.CustomMinecart;
 import com.mjkrempl.cartloader.Minecart.MinecartType;
 import org.bukkit.Server;
@@ -11,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.logging.Level;
 
 public class GiveSubcommand implements CartLoaderSubcommand {
 	private static final List<String> usage = Arrays.asList("<targets>", "<item>", "[<amount>]");
@@ -68,7 +70,12 @@ public class GiveSubcommand implements CartLoaderSubcommand {
 		
 		// Give item
 		ItemStack item = CustomMinecart.getItem(minecartType, amount);
-		targets.forEach(player -> player.getInventory().addItem(item));
+		targets.forEach(player -> FoliaSupport.executeOnEntity(
+			plugin,
+			player,
+			() -> player.getInventory().addItem(item.clone()),
+			() -> CartLoader.log(Level.WARNING, "Could not give minecart to", player.getName(), "because the player is no longer online")
+		));
 		
 		// Build info message
 		StringBuilder message = new StringBuilder()
