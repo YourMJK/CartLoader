@@ -1,7 +1,6 @@
 package com.mjkrempl.cartloader.ChunkManagement;
 
-import com.google.common.collect.Maps;
-
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -13,7 +12,10 @@ public final class WorldSavedState {
 	}
 	
 	public static WorldSavedState fromRegions(Map<UUID, ChunkCoord> entityActiveRegions) {
-		// Save the coordinates of all recently active entities
-		return new WorldSavedState(Maps.transformValues(entityActiveRegions, ChunkCoord::getPairValue));
+		// Save the coordinates of all recently active entities. Copy eagerly so the result is
+		// independent of the live map, which may be modified by region threads afterwards.
+		Map<UUID, Long> entityRegions = new HashMap<>(entityActiveRegions.size());
+		entityActiveRegions.forEach((entityUID, coord) -> entityRegions.put(entityUID, coord.getPairValue()));
+		return new WorldSavedState(entityRegions);
 	}
 }

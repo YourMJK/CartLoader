@@ -6,6 +6,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class GlobalChunkManager {
 	private final JavaPlugin plugin;
@@ -14,7 +15,7 @@ public final class GlobalChunkManager {
 	
 	public GlobalChunkManager(JavaPlugin plugin, GlobalSavedState globalState, ChunkManagerConfiguration configuration) {
 		this.plugin = plugin;
-		this.managers = new HashMap<>();
+		this.managers = new ConcurrentHashMap<>();
 		this.configuration = configuration;
 		
 		// Create a new chunk manager for each world with its saved state

@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 public class VehicleCreateEventListener implements Listener {
 	private record CustomMinecartDispenseEvent(long time, Location location) {}
 	
-	private @Nullable CustomMinecartDispenseEvent dispenseEvent;
+	private volatile @Nullable CustomMinecartDispenseEvent dispenseEvent;
 	
 	
 	@EventHandler

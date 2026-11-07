@@ -1,9 +1,8 @@
 package com.mjkrempl.cartloader.ChunkManagement;
 
+import com.mjkrempl.cartloader.FoliaSupport;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.*;
 
@@ -18,7 +17,7 @@ public final class WorldChunkManager {
 	private final Map<UUID, ChunkCoord> entityActiveRegions;
 	private final Map<UUID, Long> entityActiveTimes;
 	private final Multiset<ChunkCoord> chunkTickets;
-	private BukkitTask cleanupTask;
+	private FoliaSupport.ScheduledTask cleanupTask;
 	
 	public WorldChunkManager(JavaPlugin plugin, World world, WorldSavedState savedState, ChunkManagerConfiguration configuration) {
 		this.plugin = plugin;
@@ -39,7 +38,12 @@ public final class WorldChunkManager {
 	}
 	
 	
-	public void onEntityActivity(UUID entityUID, int x, int z) {
+	/**
+	 * Called from the thread that owns the entity, which may differ per entity on Folia.
+	 * All state is guarded by this instance's monitor because chunk tickets, region membership
+	 * and the cleanup task may be touched by several region threads and the global scheduler.
+	 */
+	public synchronized void onEntityActivity(UUID entityUID, int x, int z) {
 		// Restart cleanup task again if this is the first active entity
 		restartCleanupTask();
 		
@@ -59,7 +63,7 @@ public final class WorldChunkManager {
 		removeRegion(oldCoord);
 	}
 	
-	public WorldSavedState getSavedState() {
+	public synchronized WorldSavedState getSavedState() {
 		return WorldSavedState.fromRegions(entityActiveRegions);
 	}
 	
@@ -122,27 +126,28 @@ public final class WorldChunkManager {
 		if (cleanupTask != null && !cleanupTask.isCancelled()) return;
 		
 		// Setup periodic runnable to unload each entity's last active region after `inactiveRegionLoadTime` of inactivity
-		cleanupTask = new BukkitRunnable() {
-			@Override
-			public void run() {
-				long now = world.getGameTime();
-				
-				// Enumerate previously active entities and the time of their last activity
-				entityActiveTimes.entrySet().removeIf(entry -> {
-					long entityActiveTime = entry.getValue();
-					if ((now - entityActiveTime) < inactiveRegionLoadTime) return false;
-					
-					// Entity was inactive for longer than `inactiveRegionLoadTime`, remove last active region and forget entity
-					ChunkCoord coord = entityActiveRegions.remove(entry.getKey());
-					removeRegion(coord);
-					return true;
-				});
-				
-				// Stop task while there aren't any active entities anymore
-				if (entityActiveTimes.isEmpty()) {
-					cleanupTask.cancel();
-				}
-			}
-		}.runTaskTimer(plugin, updateInterval, updateInterval);
+		cleanupTask = FoliaSupport.runAtFixedRate(plugin, this::cleanupInactiveRegions, updateInterval, updateInterval);
+	}
+	
+	private synchronized void cleanupInactiveRegions() {
+		long now = world.getGameTime();
+		
+		// Enumerate previously active entities and the time of their last activity
+		entityActiveTimes.entrySet().removeIf(entry -> {
+			long entityActiveTime = entry.getValue();
+			if ((now - entityActiveTime) < inactiveRegionLoadTime) return false;
+			
+			// Entity was inactive for longer than `inactiveRegionLoadTime`, remove last active region and forget entity
+			ChunkCoord coord = entityActiveRegions.remove(entry.getKey());
+			if (coord != null) removeRegion(coord);
+			return true;
+		});
+		
+		// Stop task while there aren't any active entities anymore
+		if (entityActiveTimes.isEmpty()) {
+			FoliaSupport.ScheduledTask task = cleanupTask;
+			cleanupTask = null;
+			if (task != null) task.cancel();
+		}
 	}
 }
